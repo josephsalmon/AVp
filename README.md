@@ -11,9 +11,9 @@ and Available on ArXiV at http://arxiv.org/abs/1410.5014
 
 The Demo_AVP.py provides an exemple of the Adaptive Validation on two cases:
 
--the Lasso
+- the Lasso
 
--the Thresholded Ridge Regression
+- the Thresholded Ridge Regression
 
 
 
