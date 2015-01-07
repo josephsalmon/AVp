@@ -6,7 +6,8 @@ This code is associated with the article:
 
 "Optimal two-step prediction in regression"
 by Didier Chételat, Johannes Lederer, Joseph Salmon
-and Available on ArXiV at http://arxiv.org/abs/1410.5014
+
+The correpsonding paper is available on ArXiV at http://arxiv.org/abs/1410.5014
 
 
 The Demo_AVP.py provides an exemple of the Adaptive Validation on two cases:
