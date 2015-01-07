@@ -9,10 +9,13 @@ by Didier Chételat, Johannes Lederer, Joseph Salmon
 and Available on ArXiV at http://arxiv.org/abs/1410.5014
 
 
-The Demo_AVP.py would provide an exemple of the Adaptive Validation on two cases:
+The Demo_AVP.py provides an exemple of the Adaptive Validation on two cases:
 
 -the Lasso
+
 -the Thresholded Ridge Regression
+
+
 
 
 ##Dependencies
