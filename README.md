@@ -15,7 +15,7 @@ The Demo_AVP.py would provide an exemple of the Adaptive Validation on two cases
 -the Thresholded Ridge Regression
 
 
-#Dependencies:
+##Dependencies
 AVp is tested to work under Python 2.7.
 
 The required dependencies to build the software are NumPy >= 1.6.2, SciPy >= 0.9 and a working C/C++ compiler,
