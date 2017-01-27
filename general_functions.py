@@ -225,7 +225,7 @@ def ForEstimator_fast_v2(X, y, index_list_ordered, index_size_order, a_param):
                                                    length_i, X_support_i, y)
             j = i + 1
             test_result = False
-            while (j < nb_support) & (test_result==False):
+            while (j < nb_support) & (test_result is False):
                 support_for_ij = np.union1d(support_for_i,
                                             index_list_ordered[j])
                 length_ij = len(support_for_ij)
@@ -233,7 +233,8 @@ def ForEstimator_fast_v2(X, y, index_list_ordered, index_size_order, a_param):
                 coefs_for_ij, y_for_ij = Prediction_Step(support_for_ij,
                                                          length_ij,
                                                          X_support_ij, y)
-                if np.sum((y_for_ij - y_for_i)**2) <= a_param * (length_ij + length_i):
+                if np.sum((y_for_ij - y_for_i)**2) <= a_param * (length_ij +
+                                                                 length_i):
                     j += 1
                 else:
                     test_result = True
@@ -245,12 +246,11 @@ def ForEstimator_fast_v2(X, y, index_list_ordered, index_size_order, a_param):
         support_for = support_for_i
         coefs_for = coefs_for_i
         y_for = y_for_i
-        coefs_tot_FOR[support_for]=coefs_for
+        coefs_tot_FOR[support_for] = coefs_for
     return coefs_tot_FOR, y_for, index_for, support_for
 
 
-
-def AVp(X, y,  index_list_ordered, index_size_order, a_param):
+def AVp(X, y, index_list_ordered, index_size_order, a_param):
     """Compute the  ForEstimator
 
     Parameters
@@ -310,7 +310,7 @@ def AVp(X, y,  index_list_ordered, index_size_order, a_param):
             max_numb_test = len(idx_to_test)
             test_result = False
             k = 0
-            while (k < max_numb_test) & (test_result == False):
+            while (k < max_numb_test) & (test_result is False):
                 j = idx_to_test[k]
                 support_AVp_ij = np.union1d(support_AVp_i,
                                             index_list_ordered[j])
@@ -319,7 +319,8 @@ def AVp(X, y,  index_list_ordered, index_size_order, a_param):
                 coefs_AVp_ij, y_AVp_ij = Prediction_Step(support_AVp_ij,
                                                          length_ij,
                                                          X_support_ij, y)
-                if np.sum((y_AVp_ij - y_AVp_i)**2) <= a_param * (length_ij + length_i):
+                if np.sum((y_AVp_ij - y_AVp_i)**2) <= a_param * (length_ij +
+                                                                 length_i):
                     k += 1
                 else:
                     test_result = True
@@ -345,8 +346,8 @@ def AVp(X, y,  index_list_ordered, index_size_order, a_param):
     return coefs_tot_AVp, y_AVp, index_AVp, support_AVp
 
 
-def EWA(X, y, index_list_ordered, index_size_order, a_param):
-    """Compute the  EWA
+def BIC(X, y, index_list_ordered, index_size_order, a_param):
+    """Compute the  BIC
 
     Parameters
     ----------
@@ -374,45 +375,45 @@ def EWA(X, y, index_list_ordered, index_size_order, a_param):
 
     """
     n_samples, n_features = X.shape
-    coefs_tot_EWA = np.zeros([n_features, ])
+    coefs_tot_BIC = np.zeros([n_features, ])
     nb_support = len(index_size_order)
     if nb_support == 0:
         print "stupid there's no candidate in this list !!!"
-        coefs_EWA = []
-        y_EWA = []
-        index_EWA = []
-        support_EWA = []
+        coefs_BIC = []
+        y_BIC = []
+        index_BIC = []
+        support_BIC = []
     elif nb_support == 1:
 
-        index_EWA = 0
-        support_EWA = index_list_ordered[0]  # compute the A_j
+        index_BIC = 0
+        support_BIC = index_list_ordered[0]  # compute the A_j
         length_i = index_size_order[0]
-        X_support = X[:, support_EWA]
-        coefs_EWA, y_EWA = Prediction_Step(support_EWA,
+        X_support = X[:, support_BIC]
+        coefs_BIC, y_BIC = Prediction_Step(support_BIC,
                                            length_i, X_support, y)
-        coefs_tot_EWA[support_EWA] = coefs_EWA
+        coefs_tot_BIC[support_BIC] = coefs_BIC
     else:
         i = 0
         crit = np.inf
         while i < nb_support:
-            support_EWA_i = index_list_ordered[i]  # compute the A_j
+            support_BIC_i = index_list_ordered[i]  # compute the A_j
             length_i = index_size_order[i]
-            X_support_i = X[:, support_EWA_i]
-            coefs_EWA_i, y_EWA_i = Prediction_Step(support_EWA_i,
+            X_support_i = X[:, support_BIC_i]
+            coefs_BIC_i, y_BIC_i = Prediction_Step(support_BIC_i,
                                                    length_i, X_support_i, y)
-            # print(coefs_EWA_i.shape)
-            error = np.sum((y_EWA_i - y)**2)
+            # print(coefs_BIC_i.shape)
+            error = np.sum((y_BIC_i - y)**2)
             pen = a_param * (prior_fun(length_i, n_features))
             cur_crit = error + pen
             if cur_crit < crit:
                 crit = cur_crit
-                coefs_EWA = coefs_EWA_i
-                y_EWA = y_EWA_i
-                index_EWA = i
-                support_EWA = support_EWA_i
+                coefs_BIC = coefs_BIC_i
+                y_BIC = y_BIC_i
+                index_BIC = i
+                support_BIC = support_BIC_i
             i += 1
-        coefs_tot_EWA[support_EWA] = coefs_EWA
-    return coefs_tot_EWA, y_EWA, index_EWA, support_EWA
+        coefs_tot_BIC[support_BIC] = coefs_BIC
+    return coefs_tot_BIC, y_BIC, index_BIC, support_BIC
 
 
 def prior_fun(length_i, n_features):
@@ -578,7 +579,7 @@ def ForEstimator_for_display(X, y, index_list_ordered, index_size_order,
                 coefs_for_ij, y_for_ij = Prediction_Step(support_for_ij,
                                                          length_ij,
                                                          X_support_ij, y)
-                matrix_of_test[idx_re_order[i], idx_re_order[j]] = np.sum((y_for_ij - y_for_i)**2) / (length_ij+length_i)
+                matrix_of_test[idx_re_order[i], idx_re_order[j]] = np.sum((y_for_ij - y_for_i) ** 2) / (length_ij + length_i)
                 j += 1
             i += 1
 
@@ -654,7 +655,8 @@ def Av_p_for_display(X, y, index_list_ordered, index_size_order,
             coefs_for_i, y_for_i = Prediction_Step(support_for_i,
                                                    length_i, X_support_i, y)
 
-            idx_to_test = AV_p_indexes_to_consider(index_size_order, i)  # get list of indexes to test
+            idx_to_test = AV_p_indexes_to_consider(index_size_order, i)
+            # get list of indexes to test
             max_numb_test = len(idx_to_test)
             k = 0
             while (k < max_numb_test):
@@ -676,6 +678,7 @@ def Av_p_for_display(X, y, index_list_ordered, index_size_order,
         y_for = y_for_i
         coefs_tot_FOR[support_for] = coefs_for
     return coefs_tot_FOR, y_for, index_for, support_for, matrix_of_test
+
 
 def Prediction_Step(support_for, length_for, X_support, y):
     OLS = LinearRegression(fit_intercept=False)
@@ -731,7 +734,6 @@ class LSThRR(LinearModel, RegressorMixin):
         return self
 
 
-
 class LSLasso(LinearModel, RegressorMixin):
     """docstring for LSLasso"""
     def __init__(self, alpha=1.0, eps_machine=1e-12,
@@ -778,7 +780,7 @@ def LassoAVp(X, y, alpha_grid, max_iter, tol, a_param):
     return coef_LassoFOR, idx_LassoFOR
 
 
-def LassoEWA(X, y, alpha_grid, max_iter, tol, a_param):
+def LassoBIC(X, y, alpha_grid, max_iter, tol, a_param):
     _, coefs_Lasso, _ = lasso_path(X, y, alphas=alpha_grid,
                                    fit_intercept=False,
                                    max_iter=max_iter, tol=tol)
@@ -787,11 +789,11 @@ def LassoEWA(X, y, alpha_grid, max_iter, tol, a_param):
     idx_list_ordered, idx_size_order, idx_re_order = ListForOrdering_fast(
                                                  idx_list, idx_size)
 
-    coef_LassoEWA, y_EWA, idx_EWA, support_EWA = EWA(X, y, idx_list_ordered,
+    coef_LassoBIC, y_BIC, idx_BIC, support_BIC = BIC(X, y, idx_list_ordered,
                                                      idx_size_order, a_param)
-    idx_LassoEWA = idx_re_order[idx_EWA]
+    idx_LassoBIC = idx_re_order[idx_BIC]
 
-    return coef_LassoEWA, idx_LassoEWA
+    return coef_LassoBIC, idx_LassoBIC
 
 
 def LassoAVp_for_display(X, y, alpha_grid, max_iter, tol, a_param):
@@ -802,11 +804,11 @@ def LassoAVp_for_display(X, y, alpha_grid, max_iter, tol, a_param):
                                    max_iter=max_iter, tol=tol)
 
     idx_list, idx_size = Support(coefs_Lasso)
-    idx_list_ordered, idx_size_order, idx_re_order = ListForOrdering_fast(
-                                            idx_list, idx_size)
-    coef_LassoFOR,_, idx_tot_for, support_tot_for, matrix_test = Av_p_for_display(X,
-                                                y, idx_list_ordered,
-                                                idx_size_order, a_param, idx_re_order)
+    idx_list_ordered, idx_size_order, idx_re_order = \
+        ListForOrdering_fast(idx_list, idx_size)
+    coef_LassoFOR, _, idx_tot_for, support_tot_for, matrix_test = \
+        Av_p_for_display(X, y, idx_list_ordered, idx_size_order, a_param,
+                         idx_re_order)
 
     return matrix_test
 
@@ -816,6 +818,7 @@ def ComputeRidgeCoef(X, y, alpha_ridge, fit_intercept=False, tol=1e-7):
     clf.fit(X, y)
     beta_Ridge = clf.coef_
     return beta_Ridge
+
 
 def ComputeRidgeCoef2D(X, y, alpha_ridge2D, fit_intercept=False, tol=1e-7):
     #    n_alphas=alpha_ridge_tab.shape[0]
@@ -835,10 +838,11 @@ def RidgePath(X, y, alpha_ridge, alpha_th, fit_intercept=False, tol=1e-7):
 
     beta_Ridge = ComputeRidgeCoef(X, y, alpha_ridge,
                                   fit_intercept=fit_intercept, tol=tol)
-    coefs_ThRR = hardthresh(np.tile(np.reshape(beta_Ridge, [n_features, 1]),
-                           [1, n_alphas]),
-                           np.tile(np.reshape(alpha_th, [1, n_alphas]),
-                                       [n_features, 1]))
+    coefs_ThRR = hardthresh(np.tile(np.reshape(beta_Ridge,
+                                               [n_features, 1]),
+                            [1, n_alphas]),
+                            np.tile(np.reshape(alpha_th, [1, n_alphas]),
+                                    [n_features, 1]))
     return coefs_ThRR
 
 def RidgePath2D(X, y, alpha_ridge2D, n_alphas_th, max_nb_variables,
@@ -933,7 +937,8 @@ def ThRR2DCV(X, y, alpha_ridge2D, n_alphas, max_nb_variables, n_jobs=1,
 
 
 def LSThRRCV(X, y, alpha_ridge, n_alphas, max_nb_variables, n_jobs=1, cv = 10,
-                tol=1e-7, fit_intercept=False, eps_machine=1e-12):
+             tol=1e-7, fit_intercept=False, eps_machine=1e-12):
+
     beta_Ridge = ComputeRidgeCoef(X, y, alpha_ridge,
                                   fit_intercept=fit_intercept, tol=tol)
     alpha_th = ThRR_grid(beta_Ridge, n_alphas, max_nb_variables)
