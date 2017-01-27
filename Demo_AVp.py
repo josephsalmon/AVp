@@ -274,14 +274,15 @@ if do_Lasso == True:
 
         print '###################    PREDICTION ERROR    ####################'
         print ''
-        print ['CV', 'BIC', 'LSBIC', 'LSLassoCV','AVp','AVp_sighat', 'Sca-Lasso']
+        print ['CV', 'BIC', 'LSBIC', 'LSLassoCV','AVp','AVp_sighat', 'Sca-Lasso', 'Q-Agg']
         print '%.5f' %PredictionError(X, coef_LassoCV, beta_true),\
               '%.5f' %PredictionError(X, coef_LassoBIC, beta_true),\
               '%.5f' %PredictionError(X, coef_LSLassoBIC, beta_true),\
               '%.5f' %PredictionError(X, coef_LSLassoCV, beta_true),\
               '%.5f' %PredictionError(X, coef_LassoAVp, beta_true),\
               '%.5f' %PredictionError(X, coef_LassoAVp_sighat, beta_true),\
-              '%.5f' %PredictionError(X, coef_SqrtLasso_SZ, beta_true)
+              '%.5f' %PredictionError(X, coef_SqrtLasso_SZ, beta_true), \
+              '%.5f' %pred_error_QAgg
         print ''
 
         print '########################    TIMING (in s.)   ##################'
