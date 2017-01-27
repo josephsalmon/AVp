@@ -18,6 +18,9 @@ from general_tools import Support, My_nonzeros, hardthresh, ThRR_grid, \
     AV_p_indexes_to_consider
 
 
+from cvxopt import matrix, solvers
+
+
 def Support_old(coefs_path):
     """Compute for a list of n_kinks coefficients, their support and
     their size
@@ -417,6 +420,95 @@ def prior_fun(length_i, n_features):
     l1 = np.arange(1, length_i + 1)
     l2 = np.arange(1, n_features - length_i + 1)
     return length_i - np.sum(np.log(l1)) - np.sum(np.log(l2))
+
+
+
+def QAgg(X, y, alpha_grid, max_iter, tol, a_param):
+    """Compute the Q-aggregation aggregate
+
+    Parameters
+    ----------
+    X: ndarray,shape (n_samples, n_features); Design matrix aka covariates
+    elements
+
+    y : ndarray, shape = (n_samples,); noisy vector of observation
+
+    index_list_ordered: list, shape(n_kinks).
+
+    index_size_order: ndarray, shape (n_kinks,).
+
+    a_param: float : value of the parameters a in the paper
+
+    Returns
+    -------
+    coefs_for = ndarray, shape (n_features,) : coefficient estimated
+
+    y_for = ndarray, shape (n_samples,) : prediction vector
+
+    index_for: int ; index such that the coefficients estimated are for the
+    the indexes corresponding to list index_list_ordered[inde_for]
+
+    support_for: ndarray, shape (n_kinks,) : encode the support selected
+
+    """
+
+    _, coefs_Lasso, _ = lasso_path(X, y, alphas=alpha_grid,
+                                   fit_intercept=False,
+                                   max_iter=max_iter, tol=tol)
+
+    idx_list, idx_size = Support(coefs_Lasso)
+
+    n_samples, n_features = X.shape
+    coefs_tot_QAgg = np.zeros([n_features, ])
+    M = len(idx_size)
+
+    assert M > 0, "stupid there's no candidate in this list !!!"
+
+    # Calculation of the Q-aggregation weights
+
+    assert y.shape[0] == n_samples
+    
+    tupled_list = [
+            Prediction_Step( idx_list[i], idx_size[i], X[:, idx_list[i]], y)
+            for i in range(M)
+        ]
+    muj = [y_i for coefs_i, y_i in tupled_list]
+    muj = np.array(muj).T
+
+    degrees_of_freedom = np.array(idx_size)
+
+    print "X", X.shape
+    print "muj",  muj.shape
+    print "df", degrees_of_freedom.shape
+    print "y", y.shape
+    print "M", M
+
+    sigma_hat = 1.0
+    temperature = 0.00
+    prior = np.array([1.0/M for i in range(M)])
+
+    v = 0.5 * np.sum(np.multiply(muj, muj), 0)
+    u = - 2 * (muj.T.dot(y)).T
+    w = 2 * degrees_of_freedom
+    z = - np.array([sizej * np.log(n_features / sizej + 1 ) for sizej in idx_size])
+
+    gramMatrix = muj.T.dot(muj)
+
+    # Simplex constraint:
+
+    Q = matrix(gramMatrix)
+
+    p = matrix(u + v + (sigma_hat * sigma_hat) * w + (temperature * sigma_hat * sigma_hat) * z)
+
+    h = matrix(np.zeros_like(u))
+    G = matrix(np.diag(-1 * np.ones_like(u)))
+    A = matrix(np.ones_like(u).T, (1,M))
+    b = matrix(1.0)
+
+    sol = solvers.qp(Q, p, G, h, A, b)
+    y_QAgg = muj.dot(np.squeeze(np.array(sol['x'])))
+
+    return y_QAgg
 
 
 def ForEstimator_for_display(X, y, index_list_ordered, index_size_order,

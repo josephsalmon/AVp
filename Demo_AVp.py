@@ -17,6 +17,7 @@ from general_tools import Support, Refitting, ThRR_grid
 from general_functions import LSLassoCV_joe, LassoCV_joe, LassoIC_joe
 from general_functions import LSThRRCV, ThRRCV, RidgePath,ComputeRidgeCoef
 from general_functions import LassoAVp, LassoAVp_for_display, ThRRAVp, ThRRAVp_for_display
+from general_functions import QAgg
 
 from sklearn.linear_model import lasso_path, RidgeCV, Ridge
 from sklearn.linear_model.coordinate_descent import _alpha_grid
@@ -206,6 +207,20 @@ if do_Lasso == True:
                                              a_param_true)
     end_LassoAVp = time.time()
     timing_LassoAVp = end_LassoAVp - start_LassoAVp
+
+
+    ##############################################################################
+    # Q-Aggregation with sigma knowledge
+    matrix_for = LassoAVp_for_display(X, y, alpha_grid, max_iter, tol,
+                                             a_param_true)
+    blasso=Support(coefs_Lasso)[1]
+    print 'support compared in the process'
+    print blasso
+
+    y_QAgg = QAgg(X, y, alpha_grid, max_iter, tol,
+                                             a_param_true)
+    pred_error_QAgg = np.sum((y_QAgg - np.dot(X, beta_true)) ** 2) / n_samples
+
 
     ##############################################################################
     # AVp-procedure: LassoAVp with estimated noise
