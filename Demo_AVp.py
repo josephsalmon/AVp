@@ -211,11 +211,6 @@ if do_Lasso == True:
 
     ##############################################################################
     # Q-Aggregation with sigma knowledge
-    matrix_for = LassoAVp_for_display(X, y, alpha_grid, max_iter, tol,
-                                             a_param_true)
-    blasso=Support(coefs_Lasso)[1]
-    print 'support compared in the process'
-    print blasso
 
     y_QAgg = QAgg(X, y, alpha_grid, max_iter, tol,
                                              a_param_true)
