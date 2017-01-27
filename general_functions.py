@@ -434,22 +434,18 @@ def QAgg(X, y, alpha_grid, max_iter, tol, a_param):
 
     y : ndarray, shape = (n_samples,); noisy vector of observation
 
-    index_list_ordered: list, shape(n_kinks).
+    alpha_grid:
 
-    index_size_order: ndarray, shape (n_kinks,).
+    max_iter:
+
+    tol:
 
     a_param: float : value of the parameters a in the paper
 
     Returns
     -------
-    coefs_for = ndarray, shape (n_features,) : coefficient estimated
 
-    y_for = ndarray, shape (n_samples,) : prediction vector
-
-    index_for: int ; index such that the coefficients estimated are for the
-    the indexes corresponding to list index_list_ordered[inde_for]
-
-    support_for: ndarray, shape (n_kinks,) : encode the support selected
+    y_QAgg: the predicted value using QAggregation
 
     """
 
