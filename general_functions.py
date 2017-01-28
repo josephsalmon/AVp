@@ -734,6 +734,7 @@ class LSThRR(LinearModel, RegressorMixin):
 
 class LSLasso(LinearModel, RegressorMixin):
     """docstring for LSLasso"""
+
     def __init__(self, alpha=1.0, eps_machine=1e-12,
                  max_iter=10000, tol=1e-7, fit_intercept=False):
         self.alpha = alpha
@@ -760,6 +761,7 @@ class LSLasso(LinearModel, RegressorMixin):
         self.coef_ = coef
         self.intercept_ = 0.
         return self
+
 
 def LassoAVp(X, y, alpha_grid, max_iter, tol, a_param):
 
@@ -842,6 +844,7 @@ def RidgePath(X, y, alpha_ridge, alpha_th, fit_intercept=False, tol=1e-7):
                                     [n_features, 1]))
     return coefs_ThRR
 
+
 def RidgePath2D(X, y, alpha_ridge2D, n_alphas_th, max_nb_variables,
                 fit_intercept=False, tol=1e-7):
     n_features = X.shape[1]
@@ -910,7 +913,7 @@ def ThRRCV(X, y, alpha_ridge, n_alphas, max_nb_variables, n_jobs=1, cv=10,
 
 
 def ThRR2DCV(X, y, alpha_ridge2D, n_alphas, max_nb_variables, n_jobs=1,
-             cv = 10,tol=1e-7, fit_intercept=False):
+             cv=10, tol=1e-7, fit_intercept=False):
 
     param_grid = []
     n_alphas_ridge = len(alpha_ridge2D)
