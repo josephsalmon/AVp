@@ -423,7 +423,6 @@ def prior_fun(length_i, n_features):
     return length_i - np.sum(np.log(l1)) - np.sum(np.log(l2))
 
 
-
 def QAgg(X, y, alpha_grid, max_iter, tol, a_param):
     """Compute the Q-aggregation aggregate
 
@@ -456,7 +455,7 @@ def QAgg(X, y, alpha_grid, max_iter, tol, a_param):
     idx_list, idx_size = Support(coefs_Lasso)
 
     n_samples, n_features = X.shape
-    coefs_tot_QAgg = np.zeros([n_features, ])
+    # coefs_tot_QAgg = np.zeros([n_features, ])
     M = len(idx_size)
 
     assert M > 0, "stupid there's no candidate in this list !!!"
@@ -464,30 +463,29 @@ def QAgg(X, y, alpha_grid, max_iter, tol, a_param):
     # Calculation of the Q-aggregation weights
 
     assert y.shape[0] == n_samples
-    
-    tupled_list = [
-            Prediction_Step( idx_list[i], idx_size[i], X[:, idx_list[i]], y)
-            for i in range(M)
-        ]
+
+    tupled_list = [Prediction_Step(idx_list[i], idx_size[i],
+                                   X[:, idx_list[i]], y) for i in range(M)]
     muj = [y_i for coefs_i, y_i in tupled_list]
     muj = np.array(muj).T
 
     degrees_of_freedom = np.array(idx_size)
 
     print "X", X.shape
-    print "muj",  muj.shape
+    print "muj", muj.shape
     print "df", degrees_of_freedom.shape
     print "y", y.shape
     print "M", M
 
     sigma_hat = 1.0
     temperature = 0.00
-    prior = np.array([1.0/M for i in range(M)])
+    prior = np.array([1.0 / M for i in range(M)])
 
     v = 0.5 * np.sum(np.multiply(muj, muj), 0)
     u = - 2 * (muj.T.dot(y)).T
     w = 2 * degrees_of_freedom
-    z = - np.array([sizej * np.log(n_features / sizej + 1 ) for sizej in idx_size])
+    z = - np.array([sizej * np.log(n_features / sizej + 1) for sizej in
+                    idx_size])
 
     gramMatrix = muj.T.dot(muj)
 
@@ -495,11 +493,12 @@ def QAgg(X, y, alpha_grid, max_iter, tol, a_param):
 
     Q = matrix(gramMatrix)
 
-    p = matrix(u + v + (sigma_hat * sigma_hat) * w + (temperature * sigma_hat * sigma_hat) * z)
+    p = matrix(u + v + (sigma_hat * sigma_hat) * w +
+               (temperature * sigma_hat * sigma_hat) * z)
 
     h = matrix(np.zeros_like(u))
     G = matrix(np.diag(-1 * np.ones_like(u)))
-    A = matrix(np.ones_like(u).T, (1,M))
+    A = matrix(np.ones_like(u).T, (1, M))
     b = matrix(1.0)
 
     sol = solvers.qp(Q, p, G, h, A, b)
@@ -715,7 +714,10 @@ class LSThRR(LinearModel, RegressorMixin):
         self.fit_intercept = fit_intercept
 
     def fit(self, X, y):
-        coef_1stp = np.squeeze(RidgePath(X, y, self.alpha, np.array([self.thresh]), tol=self.tol, fit_intercept=self.fit_intercept))
+        coef_1stp = np.squeeze(RidgePath(X, y, self.alpha,
+                                         np.array([self.thresh]),
+                                         tol=self.tol,
+                                         fit_intercept=self.fit_intercept))
         n_features = X.shape[1]
         indexes_to_keep = My_nonzeros(coef_1stp, eps_machine=self.eps_machine)
         regr = LinearRegression(fit_intercept=self.fit_intercept)
@@ -766,11 +768,10 @@ def LassoAVp(X, y, alpha_grid, max_iter, tol, a_param):
                                    max_iter=max_iter, tol=tol)
 
     idx_list, idx_size = Support(coefs_Lasso)
-    idx_list_ordered, idx_size_order, idx_re_order = ListForOrdering_fast(
-                                            idx_list, idx_size)
-    coef_LassoFOR, y_tot_for, idx_tot_for, support_tot_for = AVp(X,
-                                                y, idx_list_ordered,
-                                                idx_size_order, a_param)
+    idx_list_ordered, idx_size_order, idx_re_order = \
+        ListForOrdering_fast(idx_list, idx_size)
+    coef_LassoFOR, y_tot_for, idx_tot_for, support_tot_for = \
+        AVp(X, y, idx_list_ordered, idx_size_order, a_param)
     idx_LassoFOR = idx_re_order[idx_tot_for]
 
     return coef_LassoFOR, idx_LassoFOR
@@ -782,8 +783,8 @@ def LassoBIC(X, y, alpha_grid, max_iter, tol, a_param):
                                    max_iter=max_iter, tol=tol)
 
     idx_list, idx_size = Support(coefs_Lasso)
-    idx_list_ordered, idx_size_order, idx_re_order = ListForOrdering_fast(
-                                                 idx_list, idx_size)
+    idx_list_ordered, idx_size_order, idx_re_order = \
+        ListForOrdering_fast(idx_list, idx_size)
 
     coef_LassoBIC, y_BIC, idx_BIC, support_BIC = BIC(X, y, idx_list_ordered,
                                                      idx_size_order, a_param)
@@ -853,11 +854,11 @@ def RidgePath2D(X, y, alpha_ridge2D, n_alphas_th, max_nb_variables,
 
     for i in range(n_alphas_ridge):
         alpha_th2D = ThRR_grid(beta_Ridge[i], n_alphas_th, max_nb_variables)
-        coefs_ThRR[:, i * n_alphas_th:(i + 1) * n_alphas_th] = hardthresh(
-                            np.tile(np.reshape(beta_Ridge[i], [n_features, 1]),
-                            [1, n_alphas_th]),
-                            np.tile(np.reshape(alpha_th2D, [1, n_alphas_th]),
-                            [n_features, 1]))
+        coefs_ThRR[:, i * n_alphas_th:(i + 1) * n_alphas_th] = \
+            hardthresh(np.tile(np.reshape(beta_Ridge[i], [n_features, 1]),
+                       [1, n_alphas_th]),
+                       np.tile(np.reshape(alpha_th2D, [1, n_alphas_th]),
+                       [n_features, 1]))
 
     return coefs_ThRR
 
@@ -885,12 +886,11 @@ def ThRRAVp_for_display(X, y, alpha_ridge,a_param, n_alphas,
     coefs_ThRR = RidgePath(X, y, alpha_ridge, alpha_th,
                            fit_intercept=fit_intercept, tol=tol)
     idx_list, idx_size = Support(coefs_ThRR)
-    idx_list_ordered, idx_size_order, idx_re_order = ListForOrdering_fast(
-                                                    idx_list, idx_size)
-    coef_ThRRAVp, _, idx_tot_for, support_th_for, matrix_test = Av_p_for_display(X,
-                                                y, idx_list_ordered,
-                                                idx_size_order, a_param,
-                                                idx_re_order)
+    idx_list_ordered, idx_size_order, idx_re_order = \
+        ListForOrdering_fast(idx_list, idx_size)
+    coef_ThRRAVp, _, idx_tot_for, support_th_for, matrix_test = \
+        Av_p_for_display(X, y, idx_list_ordered, idx_size_order,
+                         a_param, idx_re_order)
     return matrix_test
 
 
@@ -992,7 +992,6 @@ def LassoCV_joe(X, y, alpha_grid, n_jobs=1, cv = 10, max_iter = 10000,
 
 
 
-
 def LSLassoCV_joe(X, y, alpha_grid, n_jobs=1, cv = 10, max_iter = 10000,
                   tol=1e-7, fit_intercept=False):
     param_grid = dict(alpha=alpha_grid)
@@ -1002,7 +1001,6 @@ def LSLassoCV_joe(X, y, alpha_grid, n_jobs=1, cv = 10, max_iter = 10000,
     index_LSLassoCV = np.where(alpha_grid == gs.best_params_['alpha'])[0]
     coef_LSLassoCV = gs.best_estimator_.coef_
     return coef_LSLassoCV, index_LSLassoCV
-
 
 
 
